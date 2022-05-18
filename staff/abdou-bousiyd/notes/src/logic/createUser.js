@@ -12,7 +12,7 @@ function createUser(name, username, password, callback) {
 
         if(files.length)
             files.forEach(file => {
-                readFile(`./db/users/${file}`, 'utf', ( error, json)=>{
+                readFile(`./db/users/${file}`, 'utf8', (error, json)=>{
                     if(!_error) {
                         if(error) return callback(_error = error)
 
