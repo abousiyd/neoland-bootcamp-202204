@@ -1,5 +1,5 @@
 // const { readdir, unlink, access, fstat, writeFile } = require('fs')
-const { access, constants, readdir, readFile, unlink, rm } = require('fs')
+const { access, constants, readdir, readFile, unlink } = require('fs')
 
 const { createUser } = require('./createUser')
 const { expect } = require('chai')
