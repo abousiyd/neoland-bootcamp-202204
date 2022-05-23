@@ -8,12 +8,12 @@ function createUser(name, username, password, callback) {
     readdir('./db/users', (error, files) => {
         if(error) return callback(error)
 
-        let count = 0, _error
+        let count = 0, _error // para tomar el control de la liada asíncrona que hemos hecho
 
         if(files.length)
-            files.forEach(file => {
-                readFile(`./db/users/${file}`, 'utf8', (error, json)=>{
-                    if(!_error) {
+            files.forEach(file => { // de forma sincrona va a lanzar todos los readFile(se lanzan todos)
+                readFile(`./db/users/${file}`, 'utf8', (error, json)=>{ // esto llega cuando llegue, tarda tiempo
+                    if(!_error) { // En la primera esta siempre es undefined
                         if(error) return callback(_error = error)
 
                         count++
@@ -49,4 +49,4 @@ function createUser(name, username, password, callback) {
 
 }
 
-module.exports = {createUser}
+module.exports = createUser
