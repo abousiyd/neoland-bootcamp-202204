@@ -9,13 +9,6 @@ const formBodyParser = bodyParser.urlencoded({ extended: true })
 
 const port = 8080
 
-// server.get('/user', (req, res) => {
-//     const name = req.query.name
-//     const age = req.query.age
-
-//     res.status(201).send(`<h1>Hello, ${name} you have ${age}!</h1>`)  
-// })
-
 server.get('/register', (req, res) => {
     try {
         const { userId } = parseCookies(req.header('cookie'))
