@@ -1,16 +1,64 @@
+const express = require('express')
+const bodyParser = require('body-parser')
+const { registerUser, authenticateUser } = require('./logic')
+const { ConflictError, FormatError, AuthError } = require('./errors')
 const { connect, disconnect } = require('mongoose')
-const { User, Note } = require('./models')
 
-connect('mongodb://localhost:27017/notes-db', error => {
-    if (error) return console.error(error)
+connect('mongodb://localhost:27017/notes-db')
+    .then(() => {
+        console.log('DB connected')
 
-    const user = new User({ name: 'Pepito Grillo', username: 'pepigri', password: '123123123' })
+        const api = express()
 
-    user.save()
-        .then(user => {
-            const note = new Note({ user: user.id, text: 'hola mundo' })
+        const jsonBodyParser = bodyParser.json()
 
-            return note.save()
+        api.post('/api/users', jsonBodyParser, (req, res) => {
+            try {
+                const { body: { name, username, password } } = req
+
+                registerUser(name, username, password)
+                    .then(() => res.status(201).send())
+                    .catch(error => {
+                        let status = 500
+
+                        if (error instanceof ConflictError)
+                            status = 409
+
+                        res.status(status).json({ error: error.message })
+                    })
+            } catch (error) {
+                let status = 500
+
+                if (error instanceof TypeError || error instanceof FormatError)
+                    status = 400
+
+                res.status(status).json({ error: error.message })
+            }
         })
-        .then(note => disconnect())
-})
+
+        api.post('/api/users/auth', jsonBodyParser, (req, res) => {
+            try {
+                const { body: { username, password } } = req
+
+                authenticateUser(username, password)
+                    .then(userId => res.status(200).json({ token: userId }))
+                    .catch(error => {
+                        let status = 500
+
+                        if (error instanceof AuthError)
+                            status = 401
+
+                        res.status(status).json({ error: error.message })
+                    })
+            } catch (error) {
+                let status = 500
+
+                if (error instanceof TypeError || error instanceof FormatError)
+                    status = 400
+
+                res.status(status).json({ error: error.message })
+            }
+        })
+
+        api.listen(8080, () => console.log('API running'))
+    })

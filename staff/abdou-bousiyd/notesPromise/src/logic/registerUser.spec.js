@@ -1,16 +1,16 @@
 const { connect, disconnect } = require('mongoose')
 const { User } = require('../models')
 const { ConflictError } = require('../errors')
-const createUser = require('./createUser')
+const registerUser = require('./registerUser')
 const { expect } = require('chai')
 
-describe('createUser', () => { debugger
+describe('registerUser', () => {
     before(() => connect('mongodb://localhost:27017/notes-db-test'))
 
     beforeEach(() => User.deleteMany())
 
-    it('succeeds on correct credencials', () => {
-        return createUser('Peter Pan', 'peterpan', '123123123')
+    it('succeeds on correct credentials', () => {
+        return registerUser('Peter Pan', 'peterpan', '123123123')
             .then(result => {
                 expect(result).to.be.undefined
 
@@ -25,7 +25,7 @@ describe('createUser', () => { debugger
 
     it('fails when user already exists', () => {
         return User.create({ name: 'Wendy Pan', username: 'wendypan', password: '123123123'})
-            .then(() => createUser('Wendy Pan', 'wendypan', '123123123'))
+            .then(() => registerUser('Wendy Pan', 'wendypan', '123123123'))
             .catch(error => {
                 expect(error).to.be.instanceOf(ConflictError)
                 expect(error.message).to.equal(`user with username wendypan already exists`)
